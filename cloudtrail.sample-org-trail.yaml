@@ -1,0 +1,118 @@
+###
+### Ref:
+###   https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudtrail-trail.html
+###
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  OperatorEmail:
+    Type: String
+    Default: ferreira.mv@gmail.com
+    Description: "Email address to notify when new logs are published."
+
+Resources:
+
+  ###
+  ###  CloudTrail
+  ###
+  OrgTrail:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: sample-org-trail
+      IsMultiRegionTrail: true
+      IncludeGlobalServiceEvents: true
+      IsLogging: true
+      EnableLogFileValidation: true
+      S3BucketName: { "Ref": S3Bucket }
+      SnsTopicName: { "Fn::GetAtt": ["SNSTopic","TopicName"] }
+      Tags: [
+        { "Key" : "Svc", "Value" : "Cloudtrail"    },
+        { "Key" : "Env", "Value" : "Organizations" }]
+#   DependsOn:
+#     - S3BucketPolicy
+#     - SNSTopicPolicy
+
+  ###
+  ###  S3
+  ###  https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
+  ###
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: mv-organization-cloudtrail
+      Tags: [
+        { "Key" : "Svc", "Value" : "Cloudtrail"    },
+        { "Key" : "Env", "Value" : "Organizations" }]
+      BucketEncryption: {
+        "ServerSideEncryptionConfiguration": [{ "ServerSideEncryptionByDefault": { "SSEAlgorithm": "AES256" } }] }
+      MetricsConfigurations:
+        - Id: EntireBucket
+      VersioningConfiguration:
+        Status: Enabled
+#   DeletionPolicy: Retain
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: "AWSCloudTrailAclCheck"
+            Effect: "Allow"
+            Action: "s3:GetBucketAcl"
+            Principal: { "Service":"cloudtrail.amazonaws.com"}
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${S3Bucket}
+          -
+            Sid: "AWSCloudTrailWriteAcc"
+            Effect: "Allow"
+            Action: "s3:PutObject"
+            Principal: { "Service":"cloudtrail.amazonaws.com"}
+            Resource:
+              !Sub |-
+                arn:aws:s3:::${S3Bucket}/AWSLogs/${AWS::AccountId}/*
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: "bucket-owner-full-control"
+#         -
+#           Sid: "AWSCloudTrailWriteOrg"
+#           Effect: "Allow"
+#           Action: "s3:PutObject"
+#           Principal: { "Service":"cloudtrail.amazonaws.com"}
+#           Resource:
+#             !Sub |-
+#               arn:aws:s3:::${S3Bucket}/AWSLogs/o-*/*
+#           Condition:
+#             StringEquals:
+#               s3:x-amz-acl: "bucket-owner-full-control"
+
+  ###
+  ###  SNS
+  ###
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: mv-organization-cloudtrail-alerts
+      DisplayName: mv-organization-cloudtrail-alerts
+
+  SNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - Ref: "SNSTopic"
+      PolicyDocument:
+        Version: "2008-10-17"
+        Statement:
+          -
+            Sid: "AWSCloudTrailSNSPolicy"
+            Effect: "Allow"
+            Action: "SNS:Publish"
+            Principal: { "Service":"cloudtrail.amazonaws.com" }
+            Resource: "*"
+
+
