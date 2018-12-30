@@ -1,0 +1,12 @@
+{
+'Type': 'Notification',
+'MessageId': '96f1386f-4352-5136-ba54-6cf2598d8ebc',
+'TopicArn': 'arn:aws:sns:us-east-1:123456789012:myorg-cloudtrail-deliveries',
+'Message': 'CloudTrail validation message.',
+'Timestamp': '2018-12-26T05:58:55.839Z',
+'SignatureVersion': '1',
+'Signature': 'HPPrsZexKliSDm+WkjdH+5WrK7dBTMj/N0QE+un6+B2pw5gZSN/ctvi523NEVh0rdy2KZG1Jt+Hpp628FYfRD8otcqvcrQlNnEryArMNmJAYtwZ6hdeON+3ffaoWPlLh1mntAvQOYGE/NzzSQ6hEYFn8R1qpnxIkZAwQQ4Q0YhECVDkw3MhNmuHwRzv0dwj36ZNOd8iEErVJOB4twYQ/UlukYdxuMwa5Odm2h4AFXjIkOCImm21yF4k009UOW/ZrpR4rWzd/sxkTIF4r5XI1cMtF0reOLVduYd6zMzFYPxn7m+eY3sAggEjC2e2GyoglpLGn90SCKH53Zq+Gjm0UAw==',
+'SigningCertURL': 'https://sns.us-east-1.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem',
+'UnsubscribeURL': 'https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:381098461851:myorg-cloudtrail-deliveries:de0cb618-0228-4654-b463-a7be45aa0ed0'
+}
+
