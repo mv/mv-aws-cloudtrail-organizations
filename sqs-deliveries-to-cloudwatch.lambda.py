@@ -18,7 +18,9 @@ sqs_queue = 'myorg-cloudtrail-deliveries'
 sqs     = boto3.client('sqs')
 sqs_url = sqs.get_queue_url(QueueName=sqs_queue)['QueueUrl']
 
-trail_region = re.compile('_CloudTrail_(\w*-\w*-\d?)_')
+trail_region = re.compile('_CloudTrail_'        # anchor
+                          '(\w*-\w*-\d?)_'      # region: us-east-1
+                         )
 
 cw_namespace = 'CWTest'
 cw = boto3.client('cloudwatch')
